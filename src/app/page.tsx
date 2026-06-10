@@ -2,6 +2,7 @@
 
 import { useState, useId } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Spinner } from "../components/Spinner";
 
@@ -231,6 +232,15 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Link para o painel de links */}
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-sm font-medium text-neutral-400 transition-colors duration-150 hover:text-green-400 focus-visible:outline-none focus-visible:text-green-400"
+        >
+          Ver todos os links
+          <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </main>
   );
