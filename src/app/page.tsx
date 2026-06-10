@@ -36,6 +36,7 @@ export default function Home() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    /* Remover espaços em branco */
     const link = url.trim();
 
     /* Verificar se a URL existe */
@@ -55,11 +56,33 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      // TODO: Enviar link para a API de encurtamento
-      setShortenedUrl(`https://dominio.com/exemplo`);
+      /* Enviar requisição para encurtar a URL */
+      const res = await fetch("/api/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: link }),
+      });
+
+      const data = await res.json();
+
+      /* Verificar se a requisição foi bem-sucedida */
+      if (!res.ok) {
+        throw new Error(data.error || "Ocorreu um erro ao encurtar a URL.");
+      }
+
+      /* Gerar link absoluto a partir do código gerado */
+      const host = window.location.host;
+      const protocol = window.location.protocol;
+      const shortUrl = `${protocol}//${host}/u/${data.short_code}`;
+
+      setShortenedUrl(shortUrl);
     } catch (error) {
       console.error(error);
-      setError("Ocorreu um erro. Tente novamente.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Ocorreu um erro ao encurtar a URL. Tente novamente mais tarde...",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +104,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-4 py-16">
-      {/* Background glow */}
+      {/* Efeito glow */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 overflow-hidden"
@@ -111,7 +134,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Interaction card */}
+        {/* Cards */}
         <div className="w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-6 shadow-2xl">
           <form onSubmit={handleSubmit} noValidate>
             <label
@@ -143,7 +166,7 @@ export default function Home() {
               />
             </div>
 
-            {/* Error message */}
+            {/* Botão de envio */}
             <div
               id={errorId}
               role="alert"
@@ -153,7 +176,7 @@ export default function Home() {
               <p className="text-xs text-red-400">{error}</p>
             </div>
 
-            {/* Submit button */}
+            {/* Botão de envio */}
             <button
               type="submit"
               disabled={isLoading}
@@ -176,7 +199,7 @@ export default function Home() {
             </button>
           </form>
 
-          {/* Result */}
+          {/* Resultado */}
           {shortenedUrl && (
             <div className="mt-5 rounded-xl border border-green-500/30 bg-green-500/5 p-4">
               <p className="text-xs font-medium text-neutral-400 mb-2">
